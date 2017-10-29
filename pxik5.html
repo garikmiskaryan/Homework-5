@@ -1,0 +1,114 @@
+<canvas id='canvas' width="1000" height="600"></canvas>
+<script>
+	const canvas = document.getElementById('canvas');
+	const ctx = canvas.getContext('2d');
+    
+	const groundLevel = 350;
+	const maxJump = groundLevel - 250;
+
+    //keys
+	const leftKey = 37;
+    const upKey = 38;
+    const rightKey = 39;
+    
+    //Images
+	const image = new Image();
+	image.src = "https://ak6.picdn.net/shutterstock/videos/14227916/thumb/1.jpg?i10c=img.resize(height:160)";
+
+	const heroImgRight = new Image();
+	heroImgRight.src = "https://vignette2.wikia.nocookie.net/wreckitralph/images/d/dc/Ralph.png/revision/latest?cb=20161113154352";
+
+	const enemyImgR = new Image();
+	enemyImgR.src = "https://s-media-cache-ak0.pinimg.com/originals/39/78/f8/3978f82cbad6dae127728669250ddedc.jpg";	
+
+	const gameData = {
+		herO: {
+			img: heroImgRight,
+			x: 500,
+		    y: groundLevel,
+		    width: 100,
+		    height: 170,
+		    xDelta: 18,
+		    yDelta: 0,
+		},
+        badGuys: [
+            {
+			img: enemyImgR,
+			x: 10,
+		    y: groundLevel + 10,
+		    width: 100,
+		    height: 170,
+		    xDelta: 3,
+		    }
+        ]
+	}
+
+	const hero = gameData.herO;
+	const enemy = gameData.badGuys[0];
+
+
+	const draw = function(){
+        //background
+		ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+		//hero
+		ctx.drawImage(hero.img, hero.x, hero.y, hero.width, hero.height);
+		//enemy
+		ctx.drawImage(enemy.img, enemy.x, enemy.y, enemy.width, enemy.height);
+
+	}
+
+	const updateData = function(){
+		//JUMP
+		if(hero.yDelta !== 0){
+			hero.y = hero.y - hero.yDelta;
+			if(hero.y <= maxJump){
+                hero.yDelta = (hero.yDelta * -1);
+		    }else if (hero.y >= groundLevel){
+		    	hero.yDelta = 0;
+		    }
+		}
+		//enemy
+		enemy.x = enemy.x + enemy.xDelta;	
+		if(enemy.x >= canvas.width-enemy.width){
+			enemy.xDelta = enemy.xDelta * -1;
+		}else if(enemy.x <= 0){
+			enemy.xDelta = enemy.xDelta * -1;
+		}
+        if(enemy.img === enemyImgR){
+        	if(((enemy.x+enemy.width-40 >= hero.x) && (enemy.x+enemy.width-40 <= hero.x + hero.width)) 
+        		&& (enemy.y <= (hero.y + hero.height - 50))){
+       		   alert("GAME OVER");
+            }
+        }
+    }
+	
+
+
+	const loop = function(){
+		draw();
+		updateData();
+
+		requestAnimationFrame(loop);
+	}
+
+	loop();
+
+	document.addEventListener('keydown', function(event) {
+	    if(event.keyCode === rightKey) {
+            hero.x = hero.x + hero.xDelta;
+            if(hero.x >= canvas.width-hero.width){
+            	hero.x=0;
+            }
+  	    }else if(event.keyCode === leftKey){
+  	    	hero.x = hero.x - hero.xDelta;
+  	    	if(hero.x <= 0){
+  	    		hero.x=canvas.width-hero.width;
+  	    	}
+  	    }else if(event.keyCode === upKey){
+  	    	if(hero.yDelta === 0){
+  	    		hero.yDelta = 5;
+  	    	}
+  	    }
+    }, false);
+
+</script>
